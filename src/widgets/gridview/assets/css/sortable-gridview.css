@@ -1,0 +1,12 @@
+.table-striped > tbody > tr.tr-drug-highlight,
+.table-striped > tbody > tr.tr-drug-highlight:nth-of-type(odd) {
+    background-color: #FFF;
+    box-shadow: 0 3px 8px rgba(0,0,0, 0.3);
+}
+.table-striped > tbody > tr.tr-placeholder-highlight,
+.table-striped > tbody > tr.tr-placeholder-highlight:nth-of-type(odd) {
+    background-color: #018bd0;
+}
+.table-striped > tbody > tr.tr-placeholder-highlight > td {
+    height: 75px;
+}

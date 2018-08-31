@@ -1,0 +1,22 @@
+{
+    "name": "sem/yii2-sortable",
+    "description": "Full sortable pack for managing entities ordering by specific attribute and grouping filter",
+    "license": "BSD-3-Clause",
+    "type": "library",
+    "require": {
+        "php": ">=5.6.0",
+        "yiisoft/yii2": "~2.0.13",
+		"yiisoft/yii2-jui": "~2.0.0"
+    },
+    "authors": [
+        {
+            "name": "Samsonov Vladimir",
+            "email": "vs@chulakov.ru"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "sem\\sortable\\": "src/"
+        }
+    }
+}
