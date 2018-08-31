@@ -1,5 +1,5 @@
 {
-    "name": "sem/yii2-sortable",
+    "name": "sem-soft/yii2-sortable",
     "description": "Full sortable pack for managing entities ordering by specific attribute and grouping filter",
     "license": "BSD-3-Clause",
     "type": "library",
