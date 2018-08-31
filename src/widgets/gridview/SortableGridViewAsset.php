@@ -40,4 +40,12 @@ class SortableGridViewAsset extends AssetBundle
         'yii\web\JqueryAsset',
         'yii\jui\JuiAsset'
     ];
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        $this->sourcePath = __DIR__ . '/assets';
+    }
 }
