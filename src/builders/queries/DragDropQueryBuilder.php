@@ -87,7 +87,7 @@ class DragDropQueryBuilder extends AbstractQueryBuilder
                 ]);
             $this->applyFilter($a, $this->model);
 
-            $nullValue = $this->previousModel->{$this->attribute} - 1;
+            $nullValue = $this->previousModel->{$this->attribute} / 1;
 
             $a = "IFNULL((" . $a->createCommand()->getRawSql() . "),{$nullValue})";
         } else {
