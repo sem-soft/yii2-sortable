@@ -9,9 +9,6 @@ namespace sem\sortable\actions;
 
 use Yii;
 use yii\base\Exception;
-use yii\base\InvalidConfigException;
-use yii\web\Request;
-use yii\web\Response;
 use sem\sortable\builders\queries\DragDropQueryBuilder;
 
 /**
