@@ -15,9 +15,21 @@ use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Request;
+use yii\web\Response;
 
 abstract class MoveAction extends Action
 {
+
+    /**
+     * @var Request
+     */
+    protected $request;
+
+    /**
+     * @var Response
+     */
+    protected $response;
 
     /**
      * @var string Класс модели
@@ -41,6 +53,14 @@ abstract class MoveAction extends Action
     public function init()
     {
         parent::init();
+
+        $this->response = Yii::$app->response;
+        $this->request = Yii::$app->request;
+
+        if ($this->isClearAjax) {
+            $this->response->format = Response::FORMAT_JSON;
+        }
+
         if (empty($this->modelClass) || !class_exists($this->modelClass)) {
             throw new InvalidConfigException('Некорректно настроен класс модели.');
         }

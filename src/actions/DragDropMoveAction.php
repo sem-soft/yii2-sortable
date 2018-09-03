@@ -46,32 +46,6 @@ class DragDropMoveAction extends MoveAction
 {
 
     /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
-     * @var Response
-     */
-    protected $response;
-
-    /**
-     * @inheritdoc
-     * @throws InvalidConfigException
-     */
-    public function init()
-    {
-        parent::init();
-
-        $this->response = Yii::$app->response;
-        $this->request = Yii::$app->request;
-
-        if ($this->isClearAjax) {
-            $this->response->format = Response::FORMAT_JSON;
-        }
-    }
-
-    /**
      * @inheritdoc
      */
     public function run()
