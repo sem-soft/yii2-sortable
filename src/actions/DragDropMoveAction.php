@@ -8,11 +8,8 @@
 namespace sem\sortable\actions;
 
 use Yii;
-use yii\base\Action;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
-use yii\db\ActiveRecord;
-use yii\web\BadRequestHttpException;
 use yii\web\Request;
 use yii\web\Response;
 use sem\sortable\builders\queries\DragDropQueryBuilder;
@@ -45,22 +42,8 @@ use sem\sortable\builders\queries\DragDropQueryBuilder;
  * @property-read bool isClearAjax
  * @todo Предусмотреть вариант, когда первичные ключи моделей - серриализованы в json в случае с составным ключом
  */
-class DragDropMoveAction extends Action
+class DragDropMoveAction extends MoveAction
 {
-    /**
-     * @var string Класс модели
-     */
-    public $modelClass;
-
-    /**
-     * @var string Атрибут сортировки
-     */
-    public $attribute = 'sort';
-
-    /**
-     * @var array|callable Фильтр для выбора участников сортировки
-     */
-    public $filter;
 
     /**
      * @var Request
@@ -79,13 +62,6 @@ class DragDropMoveAction extends Action
     public function init()
     {
         parent::init();
-        if (empty($this->modelClass) || !class_exists($this->modelClass)) {
-            throw new InvalidConfigException('Некорректно настроен класс модели.');
-        }
-
-        if (empty($this->attribute)) {
-            throw new InvalidConfigException('Требуется указать атрибут сортировки.');
-        }
 
         $this->response = Yii::$app->response;
         $this->request = Yii::$app->request;
@@ -97,7 +73,6 @@ class DragDropMoveAction extends Action
 
     /**
      * @inheritdoc
-     * @throws BadRequestHttpException
      */
     public function run()
     {
@@ -131,58 +106,5 @@ class DragDropMoveAction extends Action
         }
 
         return $this->successResponse();
-    }
-
-    /**
-     * Генерирует неудачный вариант ответа
-     * @param string $message
-     * @return mixed
-     * @throws BadRequestHttpException
-     */
-    protected function errorResponse($message)
-    {
-        if ($this->isClearAjax) {
-            throw new BadRequestHttpException($message);
-        }
-
-        Yii::$app->session->setFlash('sort-error', $message);
-
-        return $this->response->redirect(Yii::$app->getUser()->getReturnUrl(), 302, !$this->isClearAjax ? false : true);
-    }
-
-    /**
-     * Генерирует удачный вариант ответа
-     * @return mixed
-     */
-    protected function successResponse()
-    {
-        if ($this->isClearAjax) {
-            return [
-                'success' => true
-            ];
-        }
-
-        return $this->response->redirect(Yii::$app->getUser()->getReturnUrl(), 302, !$this->isClearAjax ? false : true);
-    }
-
-    /**
-     * Выполянет проверку, является ли запрос чисто AJAX или используется технология Pjax
-     * @return bool
-     */
-    protected function getIsClearAjax()
-    {
-        return !$this->request->isPjax && $this->request->isAjax;
-    }
-
-    /**
-     * Производит поиск модели по первичному ключу
-     * @param mixed $key
-     * @return ActiveRecord
-     */
-    protected function findModel($key)
-    {
-        /** @var ActiveRecord $modelClass */
-        $modelClass = $this->modelClass;
-        return $modelClass::findOne($key);
     }
 }

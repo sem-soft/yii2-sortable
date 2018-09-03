@@ -7,9 +7,7 @@
 
 namespace sem\sortable\actions;
 
-use yii\base\Action;
-use yii\db\ActiveRecord;
-use yii\web\NotFoundHttpException;
+use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use sem\sortable\factories\StepQueryBuilderFactory;
 
@@ -47,24 +45,12 @@ use sem\sortable\factories\StepQueryBuilderFactory;
  *  }
  * ```
  */
-class StepMoveAction extends Action
+class StepMoveAction extends MoveAction
 {
     /**
      * @var string Позиция смещения
      */
     public $direction;
-    /**
-     * @var string Класс смещаемой модели
-     */
-    public $modelClass;
-    /**
-     * @var string Наименование атрибута порядка
-     */
-    public $attribute = 'sort';
-    /**
-     * @var array|callable Фильтр для выбора участников сортировки
-     */
-    public $filter;
 
     /**
      * @inheritdoc
@@ -76,44 +62,25 @@ class StepMoveAction extends Action
         if (!$this->direction) {
             throw new InvalidConfigException('Не указано направление смещения');
         }
-        if (!$this->modelClass || !class_exists($this->modelClass)) {
-            throw new InvalidConfigException('Не указан класс смещаемой модели');
-        }
-        if (!$this->attribute) {
-            throw new InvalidConfigException('Не указано название атрибута порядка модели');
-        }
     }
 
     /**
      * @inheritdoc
-     * @throws NotFoundHttpException
+     * @throws \yii\web\BadRequestHttpException
      */
     public function run($id)
     {
         $model = $this->findModel($id);
-        $queryBuilder = StepQueryBuilderFactory::getInstance($model, $this->direction, $this->attribute);
-        $queryBuilder->setFilter($this->filter);
-        $model->updateAttributes([
-            $this->attribute => $queryBuilder->getQuery()->scalar()
-        ]);
-
-        return $this->controller->goBack();
-    }
-
-    /**
-     * Поиск модели для смены позиции
-     *
-     * @param integer $id
-     * @return ActiveRecord
-     * @throws NotFoundHttpException
-     */
-    protected function findModel($id)
-    {
-        /** @var ActiveRecord $modelClass */
-        $modelClass = $this->modelClass;
-        if ($model = $modelClass::findOne($id)) {
-            return $model;
+        try {
+            $queryBuilder = StepQueryBuilderFactory::getInstance($model, $this->direction, $this->attribute);
+            $queryBuilder->setFilter($this->filter);
+            $model->updateAttributes([
+                $this->attribute => $queryBuilder->getQuery()->scalar()
+            ]);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage());
         }
-        throw new NotFoundHttpException("Перемещаемый объект не найден или был удален ранее");
+
+        return $this->successResponse();
     }
 }
