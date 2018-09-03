@@ -70,7 +70,9 @@ class StepMoveAction extends MoveAction
      */
     public function run($id)
     {
-        $model = $this->findModel($id);
+        if (!$model = $this->findModel($id)) {
+            return $this->errorResponse("Сортируемая модель не найдена или была удалена ранее");
+        }
         try {
             $queryBuilder = StepQueryBuilderFactory::getInstance($model, $this->direction, $this->attribute);
             $queryBuilder->setFilter($this->filter);

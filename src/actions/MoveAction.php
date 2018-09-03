@@ -114,16 +114,12 @@ abstract class MoveAction extends Action
     /**
      * Производит поиск модели по первичному ключу
      * @param mixed $key
-     * @return ActiveRecord
-     * @throws NotFoundHttpException
+     * @return ActiveRecord|null
      */
     protected function findModel($key)
     {
         /** @var ActiveRecord $modelClass */
         $modelClass = $this->modelClass;
-        if ($model = $modelClass::findOne($key)) {
-            return $model;
-        }
-        throw new NotFoundHttpException("Перемещаемый объект не найден или был удален ранее");
+        return $modelClass::findOne($key);
     }
 }
