@@ -74,27 +74,12 @@ class DragDropQueryBuilder extends AbstractQueryBuilder
      */
     protected function getA()
     {
-        if (!$this->nextModel) {
-            $a = (new Query())
-                ->select([
-                    'a' => "MAX({$this->attribute})"
-                ])
-                ->from($this->getTableName())
-                ->andWhere([
-                    '<',
-                    $this->attribute,
-                    $this->previousModel->{$this->attribute}
-                ]);
-            $this->applyFilter($a, $this->model);
 
-            $nullValue = $this->previousModel->{$this->attribute} / 2;
-
-            $a = "IFNULL((" . $a->createCommand()->getRawSql() . "),{$nullValue})";
-        } else {
-            $a = $this->nextModel->{$this->attribute};
+        if ($this->nextModel){
+            return $this->nextModel->{$this->attribute};
         }
 
-        return $a;
+        return $this->getXOperand($this->previousModel);
     }
 
     /**
@@ -103,27 +88,48 @@ class DragDropQueryBuilder extends AbstractQueryBuilder
      */
     protected function getB()
     {
-        if (!$this->previousModel) {
-            $b = (new Query())
-                ->select([
-                    'b' => "MIN({$this->attribute})"
-                ])
-                ->from($this->getTableName())
-                ->andWhere([
-                    '>',
-                    $this->attribute,
-                    $this->nextModel->{$this->attribute}
-                ]);
+        if ($this->previousModel) {
+            return $this->previousModel->{$this->attribute};
+        }
+        return $this->getXOperand($this->nextModel);
+    }
 
-            $this->applyFilter($b, $this->model);
-
-            $nullValue = $this->nextModel->{$this->attribute} + 1;
-
-            $b = "IFNULL((" . $b->createCommand()->getRawSql() . "), {$nullValue})";
+    /**
+     * Если один из операндов А или В не определен - метод вычисляет его,
+     * с учетом направления перемещения
+     * @param ActiveRecord $xModel
+     * @return string
+     */
+    protected function getXOperand(ActiveRecord $xModel)
+    {
+        // В зависимости от направления определяем недостающий операнд
+        if (($this->model->{$this->attribute} - $xModel->{$this->attribute}) < 0) {
+            $operator = '>';
+            $direction = SORT_ASC;
+            $x =  $xModel->{$this->attribute} + 1;
         } else {
-            $b = $this->previousModel->{$this->attribute};
+            $operator = '<';
+            $direction = SORT_DESC;
+            $x =  $xModel->{$this->attribute} / 2;
         }
 
-        return $b;
+        $xQuery = (new Query())
+            ->select([
+                $this->attribute
+            ])
+            ->from($this->getTableName())
+            ->andWhere([
+                $operator,
+                $this->attribute,
+                $xModel->{$this->attribute}
+            ])
+            ->orderBy([
+                $this->attribute => $direction
+            ])
+            ->limit(1);
+
+        $this->applyFilter($xQuery, $this->model);
+
+        return "IFNULL((" . $xQuery->createCommand()->getRawSql() . "),{$x})";
     }
 }
