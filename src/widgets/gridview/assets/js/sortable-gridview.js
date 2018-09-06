@@ -12,7 +12,7 @@ var SortableGridView = (function($) {
         this.$table = this.$wrapper.find('tbody');
         this.$dummyLink = this.$wrapper.find('#sort-dummy-' + this.$wrapper.attr('id'));
         this.url = this.$dummyLink.attr('data-sort_url');
-        this.isPjax = $wrapper.attr('data-is_pjax');
+        this.isPjax = this.$wrapper.parent().is('[data-pjax-container]');
     }
 
     /**
@@ -55,7 +55,7 @@ var SortableGridView = (function($) {
             url
         );
 
-        if (this.isPjax == 1) {
+        if (this.isPjax) {
             this.$dummyLink.trigger('click');
         } else {
             window.location.href = url;
