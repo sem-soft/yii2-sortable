@@ -180,7 +180,7 @@ All widgets adapted to work with Pjax tech.
 1. GridView widget with Step-based ordering buttons.
 	```php
         <?php \yii\widgets\Pjax::begin();?>
-        <?= \yii\grid\GridView\GridView::widget([
+        <?= \yii\grid\GridView::widget([
             'dataProvider' => $dataProvider,
             'columns' => [
 	            ...
@@ -210,13 +210,12 @@ All widgets adapted to work with Pjax tech.
         ]); ?>
         <?php \yii\widgets\Pjax::end();?>
 	```
-2. SortableGridView widget. Allows Drag and Drop selected entity over his table list. Also support Pjax, but must be configured with ```'withPjax' => true``` option. Now, this widget supports only GET-method. In the future, POST-method support will be added.
+2. SortableGridView widget. Allows Drag and Drop selected entity over his table list. Also support Pjax. Widget detects Pjax sorround automaticly. Now, this widget supports only GET-method. In the future, POST-method support will be added.
 	```php
 	        <?php \yii\widgets\Pjax::begin();?>
 	        <?= \sem\sortable\widgets\gridview\SortableGridView::widget([
 	            'dataProvider' => $dataProvider,
 	            'sortActionRoute' => ['swap'],
-	            'withPjax' => true,
 	            'columns' => [
 					...
 	                [
