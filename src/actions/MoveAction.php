@@ -13,6 +13,8 @@ use Yii;
 use yii\base\Action;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Request;
@@ -118,8 +120,39 @@ abstract class MoveAction extends Action
      */
     protected function findModel($key)
     {
+        if (!is_array($key)) {
+            // Декодим json, если пришел составной ключ, либо строку, если пришло значение простого идентификатора
+            $key = Json::decode($key);
+        }
+
         /** @var ActiveRecord $modelClass */
         $modelClass = $this->modelClass;
-        return $modelClass::findOne($key);
+
+        $tableName = $modelClass::tableName();
+
+        $tablePk = $modelClass::primaryKey();
+
+        $pk = [];
+
+        if (ArrayHelper::isAssociative($key)) {
+
+            foreach ($tablePk as $field) {
+
+                if (!isset($key[$field])) {
+                    $this->errorResponse("Неверное значение для первичного ключа");
+                }
+
+                $pk[$tableName . '.' . $field] = $key[$field];
+            }
+
+        } else {
+
+            $pk[$tableName . '.' . $tablePk[0]] = $key;
+
+        }
+
+        return $modelClass::find()
+            ->andWhere($pk)
+            ->one();
     }
 }
