@@ -7,6 +7,7 @@
 
 namespace sem\sortable\actions;
 
+use PHPUnit\Util\Log\JSON;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use sem\sortable\factories\StepQueryBuilderFactory;
@@ -66,13 +67,13 @@ class StepMoveAction extends MoveAction
 
     /**
      * @inheritdoc
-     * @throws \yii\web\BadRequestHttpException
      */
-    public function run($id)
+    public function run()
     {
-        if (!$model = $this->findModel($id)) {
+        if (!$model = $this->findModel($this->request->get())) {
             return $this->errorResponse("Сортируемая модель не найдена или была удалена ранее");
         }
+
         try {
             $queryBuilder = StepQueryBuilderFactory::getInstance($model, $this->direction, $this->attribute);
             $queryBuilder->setFilter($this->filter);
