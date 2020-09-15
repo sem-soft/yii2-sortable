@@ -45,8 +45,9 @@ var SortableGridView = (function($) {
      * @param $tr
      */
     SortableContainer.prototype.swap = function ($tr) {
-        var url = this.url
-            + '?currentKey=' + encodeURIComponent($tr.attr('data-key'))
+        var ds = this.url.indexOf('?') >= 0 ? '&' : '?';
+        var url = this.url + ds
+            + 'currentKey=' + encodeURIComponent($tr.attr('data-key'))
             + '&previousKey=' + encodeURIComponent(($tr.prev().attr('data-key') || null))
             + '&nextKey=' + encodeURIComponent(($tr.next().attr('data-key') || null));
 
